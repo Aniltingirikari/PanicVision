@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Detection</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+    <div style="display:flex; align-items:center; gap:10px;">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" 
+         width="40" height="40" 
+         style="border-radius:50%;">
+
+    <h2 style="margin:0;">PANIC VISION</h2>
+</div>
+
+    <div>
+        {% if session.get('user') %}
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('image') }}">Image Detection</a>
+        <a href="{{ url_for('video') }}">Video Detection</a>
+        <a href="{{ url_for('logs') }}">Logs</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+        {% else %}
+
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+        
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="container">
+
+<h1>Image Detection 📸</h1>
+
+<p style="text-align:center;">
+Upload an image to detect number of people and crowd density level.
+</p>
+
+<br>
+
+<!-- IMAGE UPLOAD FORM -->
+<form action="/image_detect" method="POST" enctype="multipart/form-data">
+    <input type="file" name="image" required>
+    <br><br>
+    <button type="submit">Detect Crowd</button>
+</form>
+
+<br>
+
+<!-- DETECTION RESULT -->
+{% if result_image %}
+
+<hr>
+
+<h2>Detection Result</h2>
+
+<p>
+<strong>Total People Detected:</strong> {{ people_count }}
+</p>
+
+<p>
+<strong>Crowd Status:</strong>
+
+{% if "LOW" in panic_status %}
+    <span class="low">{{ panic_status }}</span>
+
+{% elif "MEDIUM" in panic_status %}
+    <span class="medium">{{ panic_status }}</span>
+
+{% elif "HIGH" in panic_status %}
+    <span class="high">{{ panic_status }}</span>
+
+{% else %}
+    <span class="panic">{{ panic_status }}</span>
+{% endif %}
+
+</p>
+
+<br>
+
+<!-- 🚨 PANIC ALERT SYSTEM -->
+{% if "PANIC" in panic_status %}
+
+<script>
+    document.body.classList.add("panic-alert");
+</script>
+
+<audio id="siren" autoplay loop>
+    <source src="{{ url_for('static', filename='sounds/siren.mp3') }}" type="audio/mpeg">
+</audio>
+
+<script>
+    document.getElementById("siren").play();
+</script>
+
+<h2 style="text-align:center; color:red; font-size:30px;">
+    🚨 PANIC ALERT 🚨
+</h2>
+
+{% endif %}
+
+<br>
+
+<!-- RESULT IMAGE -->
+<h3 style="text-align:center;">Processed Image Output</h3>
+
+<img src="{{ result_image }}" width="80%" style="display:block; margin:auto; border-radius:10px;">
+
+{% endif %}
+
+</div>
+
+</body>
+</html>

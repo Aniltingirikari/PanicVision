@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Video Detection</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .low { color: green; font-weight: bold; }
+        .medium { color: orange; font-weight: bold; }
+        .high { color: red; font-weight: bold; }
+        .panic { color: darkred; font-weight: bold; }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+    <div style="display:flex; align-items:center; gap:10px;">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" 
+         width="40" height="40" 
+         style="border-radius:50%;">
+
+    <h2 style="margin:0;">PANIC VISION</h2>
+</div>
+
+    <div>
+        {% if session.get('user') %}
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('image') }}">Image Detection</a>
+        <a href="{{ url_for('video') }}">Video Detection</a>
+        <a href="{{ url_for('logs') }}">Logs</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+        {% else %}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+        
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="container">
+
+    <h1>Video Detection 🎥</h1>
+
+    <p style="text-align:center;">
+        Upload a video to analyze crowd density and detect panic conditions.
+    </p>
+
+    <br>
+
+    <!-- VIDEO UPLOAD FORM -->
+    <form action="/video_detect" method="POST" enctype="multipart/form-data">
+        <input type="file" name="video" accept="video/mp4,video/avi" required>
+        <br><br>
+        <button type="submit">Analyze Video</button>
+    </form>
+
+    <br>
+
+    <!-- RESULT SECTION -->
+    {% if people_count is not none %}
+
+    <hr>
+
+    <h2>Detection Result</h2>
+
+    <p>
+        <strong>Total People Detected:</strong>
+        {{ people_count }}
+    </p>
+
+    <p>
+        <strong>Crowd Status:</strong>
+
+        {% if "LOW" in message %}
+            <span class="low">{{ message }}</span>
+
+        {% elif "MEDIUM" in message %}
+            <span class="medium">{{ message }}</span>
+
+        {% elif "HIGH" in message %}
+            <span class="high">{{ message }}</span>
+
+        {% else %}
+            <span class="panic">{{ message }}</span>
+        {% endif %}
+
+    </p>
+
+    <br>
+
+    <!-- 🚨 PANIC ALERT SYSTEM -->
+    {% if "PANIC" in message %}
+
+    <script>
+        document.body.classList.add("panic-alert");
+    </script>
+
+    <audio id="siren" autoplay loop>
+        <source src="{{ url_for('static', filename='sounds/siren.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <script>
+        document.getElementById("siren").play();
+    </script>
+
+    <h2 style="text-align:center; color:red; font-size:30px;">
+        🚨 PANIC ALERT 🚨
+    </h2>
+
+    {% endif %}
+
+    <br>
+
+    <p style="text-align:center;">
+        📊 AI model analyzed the video frames using YOLOv8 and detected crowd density.
+    </p>
+
+    <!-- PROCESSED VIDEO OUTPUT -->
+    {% if output_video %}
+
+    <h3 style="text-align:center;">Processed Video Output 🎥</h3>
+
+    <video width="70%" controls style="display:block; margin:auto; border-radius:10px;">
+        <source src="{{ output_video }}" type="video/mp4">
+    </video>
+
+    {% endif %}
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

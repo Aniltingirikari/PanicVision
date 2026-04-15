@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+    <div style="display:flex; align-items:center; gap:12px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" 
+             class="logo">
+
+        <h2>PANIC VISION</h2>
+    </div>
+
+    <div>
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+    </div>
+
+</div>
+
+<!-- LOGIN FORM -->
+<div class="container">
+
+    <h1>Login to Panic Vision</h1>
+
+    <p class="subtitle">
+        Access your AI Crowd Panic Detection System
+    </p>
+
+    <!-- IMPORTANT FIX HERE -->
+    <form action="/login" method="POST" class="form-box">
+
+        <input type="email"
+               name="email"
+               placeholder="Enter your email"
+               required>
+
+        <input type="password"
+               name="password"
+               placeholder="Enter your password"
+               required>
+
+        <button type="submit">Login</button>
+
+    </form>
+
+    <p class="bottom-text">
+        Don't have an account?
+        <a href="/register">Register here</a>
+    </p>
+
+</div>
+
+</body>
+</html>

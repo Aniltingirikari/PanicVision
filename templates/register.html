@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Register</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .form-box {
+            max-width: 400px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-box input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+        }
+
+        .form-box button {
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #4fc3f7;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .form-box button:hover {
+            background: #29b6f6;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+    <div style="display:flex; align-items:center; gap:10px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" 
+             width="40" height="40" 
+             style="border-radius:50%; object-fit:cover;">
+
+        <h2 style="margin:0;">PANIC VISION</h2>
+    </div>
+
+    <div>
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+    </div>
+
+</div>
+
+<!-- FORM CONTAINER -->
+<div class="container">
+
+    <h1>Create Account</h1>
+
+    <p style="text-align:center;">
+        Join Panic Vision AI Crowd Detection System
+    </p>
+
+    <br>
+
+    <form method="POST" class="form-box">
+
+        <input type="text" 
+               name="username" 
+               placeholder="Enter username" 
+               required>
+
+        <input type="email" 
+               name="email" 
+               placeholder="Enter email" 
+               required>
+
+        <input type="password" 
+               name="password" 
+               placeholder="Enter password" 
+               required>
+
+        <button type="submit">Register</button>
+
+    </form>
+
+    <br>
+
+    <p style="text-align:center;">
+        Already have an account?
+        <a href="/login">Login here</a>
+    </p>
+
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Home</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+    <div style="display:flex; align-items:center; gap:10px;">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" 
+         width="40" height="40" 
+         style="border-radius:50%;">
+
+         <h2 style="margin:0;">PANIC VISION</h2>
+    </div>
+
+    <div>
+
+        {% if session.get('user') %}
+
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('image') }}">Image Detection</a>
+        <a href="{{ url_for('video') }}">Video Detection</a>
+        <a href="{{ url_for('logs') }}">Logs</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+
+<!-- HERO SECTION -->
+
+<div class="container">
+
+<h1>AI Crowd Panic Detection System</h1>
+
+<p style="text-align:center;">
+
+Advanced AI-powered system for predicting and preventing panic situations
+in crowded environments using computer vision technology.
+
+</p>
+
+
+<br>
+
+
+<!-- FEATURE BUTTONS -->
+
+<div style="text-align:center;">
+
+<a href="/image">
+<button>Image Detection</button>
+</a>
+
+<a href="/video">
+<button>Video Detection</button>
+</a>
+
+</div>
+
+</div>
+
+
+
+<!-- PROJECT DESCRIPTION -->
+
+<div class="container">
+
+
+<p>
+
+PanicVision is an Artificial Intelligence-based crowd monitoring system
+designed to detect unusual crowd density levels from uploaded images
+and videos. The system automatically classifies crowd conditions into
+Low, Medium, High, and Panic Alert levels to support safety monitoring
+in public environments.
+
+</p>
+
+</div>
+
+
+<!-- ALERT LEVEL INFO -->
+
+<div class="container">
+
+<h2>🚦 Crowd Alert Levels</h2>
+
+<ul>
+
+<li class="low">LOW CROWD → Safe Condition</li>
+
+<li class="medium">MEDIUM CROWD → Moderate Density</li>
+
+<li class="high">HIGH CROWD → Warning Level</li>
+
+<li class="panic">PANIC ALERT → Immediate Action Required 🚨</li>
+
+</ul>
+
+</div>
+
+
+<!-- FEATURE CARDS -->
+
+<div class="container">
+
+<br>
+<table width="100%" cellpadding="20">
+<tr>
+<section class="features">
+
+    <h1>🚀 System Features</h1>
+
+    <div class="feature-grid">
+
+        <div class="card">
+            <h3>🔍 AI Crowd Detection</h3>
+            <p>Detect and count people in images and videos using YOLO AI model with high accuracy.</p>
+        </div>
+
+        <div class="card">
+            <h3>🎥 Video Analysis</h3>
+            <p>Analyze uploaded videos frame-by-frame to monitor crowd density in real-time.</p>
+        </div>
+
+        <div class="card">
+            <h3>🚨 Panic Alert</h3>
+            <p>Automatically triggers alerts when crowd exceeds safe threshold.</p>
+        </div>
+
+        <div class="card">
+            <h3>🔊 Siren System</h3>
+            <p>Emergency siren activates instantly during panic situations.</p>
+        </div>
+
+        <div class="card">
+            <h3>📩 Telegram Alerts</h3>
+            <p>Get instant notifications on your phone when panic is detected.</p>
+        </div>
+
+        <div class="card">
+            <h3>📊 Live Dashboard</h3>
+            <p>Real-time monitoring with dynamic updates and visual alerts.</p>
+        </div>
+
+        <div class="card">
+            <h3>📈 Analytics Graph</h3>
+            <p>Track people count trends using interactive charts.</p>
+        </div>
+
+        <div class="card">
+            <h3>🧾 Logs System</h3>
+            <p>Stores detection history with timestamps for analysis.</p>
+        </div>
+
+        <div class="card">
+            <h3>🔐 Secure Login</h3>
+            <p>Authentication system to protect access and data.</p>
+        </div>
+
+        <div class="card">
+            <h3>⚡ Real-Time Updates</h3>
+            <p>Auto-refresh system ensures live monitoring without reload.</p>
+        </div>
+
+        <div class="card">
+            <h3>🌐 Remote Access</h3>
+            <p>Access your system from anywhere using a browser.</p>
+        </div>
+
+        <div class="card">
+            <h3>🧠 YOLO AI Engine</h3>
+            <p>Powered by advanced deep learning model for fast detection.</p>
+        </div>
+
+    </div>
+
+</section>
+</tr>
+
+</table>
+
+</div>
+
+
+</body>
+</html>

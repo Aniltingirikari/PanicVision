@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .alert-box {
+            padding: 20px;
+            border-radius: 10px;
+            background: #222;
+            color: white;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .panic {
+            background: red !important;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% {opacity: 1;}
+            50% {opacity: 0.3;}
+            100% {opacity: 1;}
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #0a1a2f;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+    <div style="display:flex; align-items:center; gap:10px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" 
+             width="40" height="40" style="border-radius:50%;">
+        <h2 style="margin:0;">PANIC VISION</h2>
+    </div>
+
+    <div>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/image">Image Detection</a>
+        <a href="/video">Video Detection</a>
+        <a href="/logs">Logs</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+
+    <h1>📊 Smart Crowd Monitoring Dashboard</h1>
+
+    <!-- 🔴 LIVE ALERT -->
+    <div id="alertBox" class="alert-box">
+        <h2 id="panicText">SAFE ✅</h2>
+        <p>People Count: <span id="people">0</span></p>
+    </div>
+
+    <!-- 🔊 SOUND -->
+    <audio id="siren" src="{{ url_for('static', filename='sounds/siren.mp3') }}"></audio>
+    <button onclick="enableSound()">Enable Sound 🔊</button>
+
+    <!-- 📊 ANALYTICS CARDS -->
+    <div class="dashboard-grid">
+
+        <div class="card">
+            <h3>Last Status</h3>
+            <p>{{ last_status }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Panic Threshold</h3>
+            <p>{{ threshold }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Logs</h3>
+            <p>{{ total_logs }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Users</h3>
+            <p>{{ total_users }}</p>
+        </div>
+
+    </div>
+
+    <!-- 📈 GRAPH -->
+    <h2 style="margin-top:30px;">📈 Crowd Detection Trend</h2>
+    <canvas id="crowdChart"></canvas>
+
+</div>
+
+<!-- SCRIPT -->
+<script>
+
+let sirenPlaying = false;
+
+// 🔊 ENABLE SOUND
+function enableSound() {
+    let s = document.getElementById("siren");
+
+    s.play().then(() => {
+        s.pause();
+        s.currentTime = 0;
+        alert("Sound Enabled ✅");
+    }).catch(() => {
+        alert("Click again to enable sound");
+    });
+}
+
+// 🔁 LIVE DATA
+function fetchLiveData() {
+    fetch("/live_data")
+    .then(res => res.json())
+    .then(data => {
+
+        document.getElementById("people").innerText = data.people;
+        document.getElementById("panicText").innerText = data.panic;
+
+        let box = document.getElementById("alertBox");
+        let siren = document.getElementById("siren");
+
+        if (data.panic.includes("PANIC")) {
+
+            box.classList.add("panic");
+
+            if (!sirenPlaying) {
+                siren.loop = true;
+                siren.play();
+                sirenPlaying = true;
+            }
+
+        } else {
+
+            box.classList.remove("panic");
+
+            siren.pause();
+            siren.currentTime = 0;
+            sirenPlaying = false;
+        }
+
+    });
+}
+
+// AUTO REFRESH
+setInterval(fetchLiveData, 2000);
+
+
+// 📊 CHART
+const ctx = document.getElementById('crowdChart').getContext('2d');
+
+const crowdChart = new Chart(ctx, {
+
+    type: 'line',
+
+    data: {
+        labels: {{ timestamps | safe }},
+        datasets: [{
+            label: 'People Count',
+            data: {{ people_counts | safe }},
+            borderWidth: 3,
+            tension: 0.3
+        }]
+    },
+
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                labels: { color: "white" }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: "white" }
+            },
+            y: {
+                ticks: { color: "white" }
+            }
+        }
+    }
+
+});
+
+</script>
+
+</body>
+</html>

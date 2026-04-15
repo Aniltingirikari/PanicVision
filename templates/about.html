@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>About</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+    <div style="display:flex; align-items:center; gap:10px;">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" 
+         width="40" height="40" 
+         style="border-radius:50%;">
+
+         <h2 style="margin:0;">PANIC VISION</h2>
+    </div>
+
+
+    <div>
+
+        {% if session.get('user') %}
+
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('image') }}">Image Detection</a>
+        <a href="{{ url_for('video') }}">Video Detection</a>
+        <a href="{{ url_for('logs') }}">Logs</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+        {% else %}
+
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- ABOUT CONTENT -->
+<div class="container">
+
+    <h1>AI Crowd Panic Detection System</h1>
+
+    <p>
+        PanicVision is an Artificial Intelligence-based Crowd Panic Detection System
+        designed to monitor crowded public places and identify abnormal crowd density
+        conditions using computer vision techniques.
+
+    </p>
+
+    <h2>🎯 Project Objective</h2>
+    <p>
+        The main objective of this system is to detect crowd density levels and predict
+        possible panic situations using image and video analysis. It helps authorities
+        take early action before emergencies occur.
+
+    </p>
+
+    <h2>🧠 Technologies Used</h2>
+    <ul>
+        <li>Python Programming</li>
+        <li>Flask Web Framework</li>
+        <li>OpenCV (Computer Vision)</li>
+        <li>YOLOv8 Object Detection AI Model</li>
+        <li>HTML, CSS (Frontend Design)</li>
+        <li>Backend Processing System</li>
+        <li>Database SQLite</li>
+        <li>Telegram Bot API (Real-time Alerts)</li>
+        <li>Local Siren System (Audio Alert)</li>
+
+    </ul>
+
+    <h2>🚀 Key Features</h2>
+    <ul>
+         <li>User Registration and Login System</li>
+         <li> Image-based Crowd Detection</li>    
+         <li>  Video-based Crowd Detection</li>
+         <li> AI-based Human Detection using YOLO</li>
+         <li>  Real-time People Counting</li>
+         <li> Crowd Classification (Low, Medium, High, Panic)</li>
+          <li>  Automatic Panic Alert System</li>
+          <li> Siren Alert for Emergency Situations</li>
+           <li>  Telegram Notification Alerts</li>
+           <li>  Dashboard with Analytics</li>
+           <li>  Log Storage and History Tracking</li>
+           <li>Crowd Detection Trend Graph</li>
+
+    </ul>
+
+    <h2>🌍 Applications</h2>
+    <ul>
+         <li> Public Transportation Hubs</li>
+         <li>Events & Festivals</li>
+         <li> Educational Institutions</li>
+         <li> Smart Cities & Public Places</li>
+         <li> Emergency & Disaster Management</li>
+         <li> Religious Places</li>
+          <li> Airports & Security Zones</li>
+         <li> Sports Stadiums</li>
+           
+    </ul>
+
+    <h2>📊Project Outcome</h2>
+    <p>
+        This system successfully detects the number of people in crowded environments
+        and classifies crowd density levels into Low, Medium, High, and Panic Alert
+        conditions using Artificial Intelligence.
+        Classifies crowd levels into Low, Medium, High, and Panic Alert for real-time safety monitoring.
+    </p>
+
+</div>
+
+</body>
+</html>
