@@ -1,13 +1,13 @@
-# 🚨 AI Crowd Panic Detection System
+# AI Crowd Panic Detection System
 
-## 📌 Overview
+## Overview
 
 An intelligent surveillance system that detects crowd density and predicts panic situations using **Computer Vision and Artificial Intelligence**.
 It analyzes images and videos in real-time and alerts authorities during abnormal crowd conditions.
 
 ---
 
-## 🎯 Objectives
+## Objectives
 
 * Monitor crowded environments
 * Detect high-density crowd situations
@@ -16,7 +16,15 @@ It analyzes images and videos in real-time and alerts authorities during abnorma
 
 ---
 
-## 🧠 Technologies Used
+## Problem 
+
+Traditional CCTV systems only record video and rely on manual monitoring, making it difficult to detect sudden crowd surges or panic situations in real time. This delay in identifying dangerous conditions can lead to serious incidents such as stampedes, injuries, and loss of life, especially in crowded public environments.
+
+## Solution 
+
+To solve this, we developed an AI Crowd Panic Detection System that uses computer vision and a YOLO deep learning model to automatically detect people and analyze crowd density in real time. The system classifies risk levels and instantly triggers alerts through notifications and alarms when a critical threshold is reached, enabling faster response and improving public safety.
+
+## Technologies Used
 
 * Python
 * OpenCV
@@ -27,19 +35,19 @@ It analyzes images and videos in real-time and alerts authorities during abnorma
 
 ---
 
-## ⚙️ Features
+## Features
 
-* 🧍 Real-time human detection
-* 📊 Crowd density analysis
-* 🚨 Panic alert system
-* 📥 Image & video upload detection
-* 📈 Dashboard with logs
-* 🔐 User authentication (Login/Register)
-* 📩 Telegram alert integration
+*  Real-time human detection
+*  Crowd density analysis
+*  Panic alert system
+*  Image & video upload detection
+*  Dashboard with logs
+*  User authentication (Login/Register)
+*  Telegram alert integration
 
 ---
 
-## 🏗️ System Workflow
+##  System Workflow
 
 1. User uploads image/video
 2. YOLO model detects people
@@ -51,25 +59,8 @@ It analyzes images and videos in real-time and alerts authorities during abnorma
 
 ---
 
-## 📁 Project Structure
 
-```
-PANICVISION/
-│
-├── app.py
-├── requirements.txt
-├── README.md
-|
-│
-├── static/
-├── templates/
-├── uploads/
-|
-```
-
----
-
-## 💻 Installation
+## Installation
 
 ### Clone Repository
 
@@ -86,7 +77,7 @@ pip install -r requirements.txt
 
 ---
 
-## ▶️ Run the Project
+## Run the Project
 
 ```
 python app.py
@@ -100,7 +91,7 @@ http://127.0.0.1:5000
 
 
 
-## 🔮 Future Improvements
+## Future Improvements
 
 * Live CCTV camera integration
 * Mobile app alerts
@@ -109,12 +100,12 @@ http://127.0.0.1:5000
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Tingirikari Anil**
 
 ---
 
-## 📜 License
+## License
 
 This project is for educational purposes only.
