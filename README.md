@@ -66,7 +66,7 @@ To solve this, we developed an AI Crowd Panic Detection System that uses compute
 ### Clone Repository
 
 ```
-git clone https://github.com/Aniltingirikari/panic-vision.git
+git clone https://github.com/Aniltingirikari/PanicVision.git
 cd panic-vision
 ```
 
