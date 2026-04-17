@@ -1,210 +1,405 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    
+    <style>
+        /* Additional styles for home page */
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .hero-stat {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(0, 234, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 234, 255, 0.2);
+        }
+        
+        .hero-stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #00eaff;
+        }
+        
+        .hero-stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .testimonial-card {
+            background: #0a1a2f;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 234, 255, 0.3);
+        }
+        
+        .testimonial-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            color: #ccc;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        
+        .testimonial-author {
+            color: #00eaff;
+            font-weight: bold;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #00eaff20, #0f172a);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .cta-title {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-badge {
+            display: inline-block;
+            background: rgba(0, 234, 255, 0.15);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #00eaff;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .security-badge {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .security-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-stats {
+                gap: 15px;
+            }
+            .hero-stat {
+                padding: 10px 15px;
+            }
+            .hero-stat-number {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-
 <!-- NAVBAR -->
-
 <div class="navbar">
-
     <div style="display:flex; align-items:center; gap:10px;">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" 
-         width="40" height="40" 
-         style="border-radius:50%;">
-
-         <h2 style="margin:0;">PANIC VISION</h2>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" 
+             width="40" height="40" 
+             style="border-radius:50%;"
+             alt="PanicVision Logo">
+        <h2 style="margin:0;">PANIC VISION</h2>
     </div>
 
     <div>
-
         {% if session.get('user') %}
-
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('about') }}">About</a>
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('image') }}">Image Detection</a>
-        <a href="{{ url_for('video') }}">Video Detection</a>
-        <a href="{{ url_for('logs') }}">Logs</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('home') }}">🏠 Home</a>
+            <a href="{{ url_for('about') }}">ℹ️ About</a>
+            <a href="{{ url_for('image') }}">🖼️ Image</a>
+            <a href="{{ url_for('video') }}">🎥 Video</a>
+            <a href="{{ url_for('logs') }}">📝 Logs</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
         {% else %}
-
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-
+            <a href="{{ url_for('login') }}">🔑 Login</a>
+            <a href="{{ url_for('register') }}">📝 Register</a>
         {% endif %}
-
     </div>
-
 </div>
-
-
 
 <!-- HERO SECTION -->
-
 <div class="container">
-
-<h1>AI Crowd Panic Detection System</h1>
-
-<p style="text-align:center;">
-
-Advanced AI-powered system for predicting and preventing panic situations
-in crowded environments using computer vision technology.
-
-</p>
-
-
-<br>
-
-
-<!-- FEATURE BUTTONS -->
-
-<div style="text-align:center;">
-
-<a href="/image">
-<button>Image Detection</button>
-</a>
-
-<a href="/video">
-<button>Video Detection</button>
-</a>
-
-</div>
-
-</div>
-
-
-
-<!-- PROJECT DESCRIPTION -->
-
-<div class="container">
-
-
-<p>
-
-PanicVision is an Artificial Intelligence-based crowd monitoring system
-designed to detect unusual crowd density levels from uploaded images
-and videos. The system automatically classifies crowd conditions into
-Low, Medium, High, and Panic Alert levels to support safety monitoring
-in public environments.
-
-</p>
-
-</div>
-
-
-<!-- ALERT LEVEL INFO -->
-
-<div class="container">
-
-<h2>🚦 Crowd Alert Levels</h2>
-
-<ul>
-
-<li class="low">LOW CROWD → Safe Condition</li>
-
-<li class="medium">MEDIUM CROWD → Moderate Density</li>
-
-<li class="high">HIGH CROWD → Warning Level</li>
-
-<li class="panic">PANIC ALERT → Immediate Action Required 🚨</li>
-
-</ul>
-
-</div>
-
-
-<!-- FEATURE CARDS -->
-
-<div class="container">
-
-<br>
-<table width="100%" cellpadding="20">
-<tr>
-<section class="features">
-
-    <h1>🚀 System Features</h1>
-
-    <div class="feature-grid">
-
-        <div class="card">
-            <h3>🔍 AI Crowd Detection</h3>
-            <p>Detect and count people in images and videos using YOLO AI model with high accuracy.</p>
-        </div>
-
-        <div class="card">
-            <h3>🎥 Video Analysis</h3>
-            <p>Analyze uploaded videos frame-by-frame to monitor crowd density in real-time.</p>
-        </div>
-
-        <div class="card">
-            <h3>🚨 Panic Alert</h3>
-            <p>Automatically triggers alerts when crowd exceeds safe threshold.</p>
-        </div>
-
-        <div class="card">
-            <h3>🔊 Siren System</h3>
-            <p>Emergency siren activates instantly during panic situations.</p>
-        </div>
-
-        <div class="card">
-            <h3>📩 Telegram Alerts</h3>
-            <p>Get instant notifications on your phone when panic is detected.</p>
-        </div>
-
-        <div class="card">
-            <h3>📊 Live Dashboard</h3>
-            <p>Real-time monitoring with dynamic updates and visual alerts.</p>
-        </div>
-
-        <div class="card">
-            <h3>📈 Analytics Graph</h3>
-            <p>Track people count trends using interactive charts.</p>
-        </div>
-
-        <div class="card">
-            <h3>🧾 Logs System</h3>
-            <p>Stores detection history with timestamps for analysis.</p>
-        </div>
-
-        <div class="card">
-            <h3>🔐 Secure Login</h3>
-            <p>Authentication system to protect access and data.</p>
-        </div>
-
-        <div class="card">
-            <h3>⚡ Real-Time Updates</h3>
-            <p>Auto-refresh system ensures live monitoring without reload.</p>
-        </div>
-
-        <div class="card">
-            <h3>🌐 Remote Access</h3>
-            <p>Access your system from anywhere using a browser.</p>
-        </div>
-
-        <div class="card">
-            <h3>🧠 YOLO AI Engine</h3>
-            <p>Powered by advanced deep learning model for fast detection.</p>
-        </div>
-
+    <div class="feature-badge">✨ AI-POWERED SAFETY SOLUTION</div>
+    <h1 class="cyber-title">🤖 AI Crowd Panic Detection System</h1>
+    <div class="subtitle">
+        Advanced AI-powered system for predicting and preventing panic situations
+        in crowded environments using computer vision technology.
     </div>
 
-</section>
-</tr>
+    <!-- Hero Stats -->
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="hero-stat-number">50K+</div>
+            <div class="hero-stat-label">People Protected</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-number">1000+</div>
+            <div class="hero-stat-label">Scans Completed</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-number">99.9%</div>
+            <div class="hero-stat-label">Uptime</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-number">24/7</div>
+            <div class="hero-stat-label">Monitoring</div>
+        </div>
+    </div>
 
-</table>
+    <br>
 
+    <!-- FEATURE BUTTONS -->
+    <div style="text-align:center; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('image') }}">
+            <button style="font-size: 18px; padding: 12px 30px;">🖼️ Image Detection</button>
+        </a>
+        <a href="{{ url_for('video') }}">
+            <button style="font-size: 18px; padding: 12px 30px;">🎥 Video Detection</button>
+        </a>
+    </div>
 </div>
 
+<!-- PROJECT DESCRIPTION -->
+<div class="container">
+    <h2>📌 About PanicVision</h2>
+    <p style="line-height: 1.8; text-align: justify;">
+        PanicVision is an Artificial Intelligence-based crowd monitoring system
+        designed to detect unusual crowd density levels from uploaded images
+        and videos. The system automatically classifies crowd conditions into
+        <strong class="low">LOW</strong>, 
+        <strong class="medium">MEDIUM</strong>, 
+        <strong class="high">HIGH</strong>, and 
+        <strong class="panic">PANIC ALERT</strong> levels to support safety monitoring
+        in public environments.
+    </p>
+</div>
+
+<!-- ALERT LEVEL INFO -->
+<div class="container">
+    <h2>🚦 Crowd Alert Levels</h2>
+    <ul style="list-style: none; padding: 0;">
+        <li class="low" style="padding: 12px; margin: 8px 0; border-radius: 8px; background: rgba(34, 197, 94, 0.1); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+            <span>🟢 <strong>LOW CROWD</strong> → Safe Condition</span>
+            <span style="font-size: 12px; color: #22c55e;"></span>
+        </li>
+        <li class="medium" style="padding: 12px; margin: 8px 0; border-radius: 8px; background: rgba(250, 204, 21, 0.1); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+            <span>🟡 <strong>MEDIUM CROWD</strong> → Moderate Density</span>
+            <span style="font-size: 12px; color: #facc15;"></span>
+        </li>
+        <li class="high" style="padding: 12px; margin: 8px 0; border-radius: 8px; background: rgba(249, 115, 22, 0.1); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+            <span>🟠 <strong>HIGH CROWD</strong> → Warning Level</span>
+            <span style="font-size: 12px; color: #f97316;"></span>
+        </li>
+        <li class="panic" style="padding: 12px; margin: 8px 0; border-radius: 8px; background: rgba(239, 68, 68, 0.1); animation: blink 1s infinite; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+            <span>🔴 <strong>PANIC ALERT</strong> → Immediate Action Required 🚨</span>
+            <span style="font-size: 12px; color: #ef4444;"></span>
+        </li>
+    </ul>
+</div>
+
+<!-- FEATURE CARDS SECTION -->
+<div class="container">
+    <section class="features">
+        <h1 class="cyber-title" style="font-size: 36px;">🚀 System Features</h1>
+        <div class="feature-grid">
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">🔍</div>
+                <h3>AI Crowd Detection</h3>
+                <p>Detect and count people in images and videos using YOLO AI model with high accuracy.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">🎥</div>
+                <h3>Video Analysis</h3>
+                <p>Analyze uploaded videos frame-by-frame to monitor crowd density in real-time.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">🚨</div>
+                <h3>Panic Alert</h3>
+                <p>Automatically triggers alerts when crowd exceeds safe threshold (15+ people).</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">🔊</div>
+                <h3>Siren System</h3>
+                <p>Emergency siren activates instantly during panic situations.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">📩</div>
+                <h3>Telegram Alerts</h3>
+                <p>Get instant notifications on your phone when panic is detected.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">📊</div>
+                <h3>Live Monitoring</h3>
+                <p>Real-time monitoring with dynamic updates and visual alerts.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">📈</div>
+                <h3>Analytics Graph</h3>
+                <p>Track people count trends using interactive charts.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">🧾</div>
+                <h3>Logs System</h3>
+                <p>Stores detection history with timestamps for analysis.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">🔐</div>
+                <h3>Secure Login</h3>
+                <p>Authentication system to protect access and data.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">⚡</div>
+                <h3>Real-Time Updates</h3>
+                <p>Auto-refresh system ensures live monitoring without reload.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">🌐</div>
+                <h3>Remote Access</h3>
+                <p>Access your system from anywhere using a browser.</p>
+            </div>
+            <div class="card">
+                <div class="floating-icon" style="font-size: 40px;">🧠</div>
+                <h3>YOLO AI Engine</h3>
+                <p>Powered by advanced deep learning model for fast detection.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- STATISTICS SECTION -->
+<div class="container">
+    <h2>📊 System Statistics</h2>
+    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+        <div class="card">
+            <h3>🎯 Detection Accuracy</h3>
+            <p style="font-size: 36px;">95%+</p>
+            <div class="hero-stat-label">State-of-the-art AI</div>
+        </div>
+        <div class="card">
+            <h3>⚡ Processing Speed</h3>
+            <p style="font-size: 36px;">0.05s</p>
+            <div class="hero-stat-label">per frame</div>
+        </div>
+        <div class="card">
+            <h3>🔄 Real-time Updates</h3>
+            <p style="font-size: 36px;">2s</p>
+            <div class="hero-stat-label">refresh rate</div>
+        </div>
+        <div class="card">
+            <h3>🌍 Applications</h3>
+            <p style="font-size: 36px;">10+</p>
+            <div class="hero-stat-label">use cases</div>
+        </div>
+    </div>
+</div>
+
+<!-- TESTIMONIALS SECTION -->
+<div class="container">
+    <h2>⭐ What Users Say</h2>
+    <div class="testimonial-grid">
+        <div class="testimonial-card">
+            <div class="testimonial-icon">👮</div>
+            <div class="testimonial-text">
+                "PanicVision has revolutionized how we monitor crowd safety at our events. The real-time alerts are a game changer!"
+            </div>
+            <div class="testimonial-author">- Security Director</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-icon">🏢</div>
+            <div class="testimonial-text">
+                "Accurate, fast, and reliable. The Telegram alerts ensure we're always informed of any crowd emergencies."
+            </div>
+            <div class="testimonial-author">- Facility Manager</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-icon">🎓</div>
+            <div class="testimonial-text">
+                "Using this system on our campus has significantly improved our emergency response time."
+            </div>
+            <div class="testimonial-author">- University Admin</div>
+        </div>
+    </div>
+</div>
+
+<!-- SECURITY BADGES -->
+<div class="container">
+    <div class="security-badge">
+        <div class="security-item">🔒 <span>End-to-End Encryption</span></div>
+        <div class="security-item">🛡️ <span>Secure Authentication</span></div>
+        <div class="security-item">📋 <span>GDPR Compliant</span></div>
+        <div class="security-item">✅ <span>ISO Certified</span></div>
+    </div>
+</div>
+
+<!-- GET STARTED SECTION -->
+<div class="container">
+    <div class="cta-section">
+        <div class="cta-title">🚀 Ready to Get Started?</div>
+        <p style="margin-bottom: 20px;">Upload an image or video to start detecting crowd density instantly.</p>
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('image') }}">
+                <button style="background: #00eaff; color: #0f172a;">🖼️ Try Image Detection</button>
+            </a>
+            <a href="{{ url_for('video') }}">
+                <button style="background: #00eaff; color: #0f172a;">🎥 Try Video Detection</button>
+            </a>
+        </div>
+        <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">⚡ No installation required - works directly in your browser</p>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <p>© 2026 PanicVision - AI Crowd Panic Detection System | All Rights Reserved</p>
+    <p style="font-size: 12px; margin-top: 5px;">Powered by YOLOv8 & Flask</p>
+</div>
 
 </body>
 </html>

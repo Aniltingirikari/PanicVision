@@ -32,18 +32,19 @@ To solve this, we developed an AI Crowd Panic Detection System that uses compute
 * Flask (Web Framework)
 * SQLite (Database)
 * HTML, CSS (Frontend)
-
+* Telegram (API)
 ---
 
-## Features
+##  Features
 
-*  Real-time human detection
-*  Crowd density analysis
-*  Panic alert system
-*  Image & video upload detection
-*  Dashboard with logs
-*  User authentication (Login/Register)
-*  Telegram alert integration
+-  Real-time human detection
+-  Crowd density analysis
+-  Panic alert system
+-  Image & video upload detection
+-  User authentication (Login/Register)
+-  Telegram alert integration
+-  Automatic siren activation
+-  Detection history tracking
 
 ---
 
@@ -102,10 +103,9 @@ http://127.0.0.1:5000
 
 ## Author
 
-**Tingirikari Anil**
+[Tingirikari Anil]
 
 ---
 
-## License
 
-This project is for educational purposes only.
+

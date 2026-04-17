@@ -1,145 +1,492 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Detection</title>
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    
     <style>
-        .low { color: green; font-weight: bold; }
-        .medium { color: orange; font-weight: bold; }
-        .high { color: red; font-weight: bold; }
-        .panic { color: darkred; font-weight: bold; }
+        .upload-area {
+            border: 2px dashed #00eaff;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: 0.3s;
+            background: rgba(0, 234, 255, 0.05);
+        }
+        
+        .upload-area:hover {
+            border-color: #0ea5e9;
+            background: rgba(0, 234, 255, 0.1);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 234, 255, 0.2);
+        }
+        
+        .people-count-big {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .status-icon {
+            font-size: 24px;
+            vertical-align: middle;
+        }
+        
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(239, 68, 68, 0.3);
+            pointer-events: none;
+            z-index: 999;
+            animation: panicFlash 0.5s infinite;
+            display: none;
+        }
+        
+        @keyframes panicFlash {
+            0% { background: rgba(239, 68, 68, 0); }
+            50% { background: rgba(239, 68, 68, 0.5); }
+            100% { background: rgba(239, 68, 68, 0); }
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading-spinner.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 234, 255, 0.3);
+            border-top: 4px solid #00eaff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-box {
+            background: #0a1a2f;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #00eaff;
+        }
+        
+        .file-info {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        .reset-btn {
+            background: transparent;
+            border: 1px solid #f97316;
+            color: #f97316;
+            margin-left: 10px;
+        }
+        
+        .reset-btn:hover {
+            background: #f97316;
+            color: #0f172a;
+            box-shadow: 0 0 15px #f97316;
+        }
+        
+        .panic-box {
+            background: linear-gradient(135deg, #7f1d1d, #dc2626);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .processed-video {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 20px auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #0a1a2f;
+            padding: 15px;
+            border-radius: 10px;
+            flex: 1;
+            text-align: center;
+            border-left: 3px solid #00eaff;
+        }
+        
+        .stat-card h4 {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00eaff;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-bar {
+                flex-direction: column;
+            }
+            .people-count-big {
+                font-size: 32px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
+<!-- PANIC OVERLAY -->
+<div id="panicOverlay" class="alert-overlay"></div>
+
 <!-- NAVBAR -->
 <div class="navbar">
-
     <div style="display:flex; align-items:center; gap:10px;">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" 
-         width="40" height="40" 
-         style="border-radius:50%;">
-
-    <h2 style="margin:0;">PANIC VISION</h2>
-</div>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" 
+             width="40" height="40" 
+             style="border-radius:50%;"
+             alt="PanicVision Logo">
+        <h2 style="margin:0;">PANIC VISION</h2>
+    </div>
 
     <div>
         {% if session.get('user') %}
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('about') }}">About</a>
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('image') }}">Image Detection</a>
-        <a href="{{ url_for('video') }}">Video Detection</a>
-        <a href="{{ url_for('logs') }}">Logs</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
-
+            <a href="{{ url_for('home') }}">🏠 Home</a>
+            <a href="{{ url_for('about') }}">ℹ️ About</a>
+            <a href="{{ url_for('image') }}">🖼️ Image</a>
+            <a href="{{ url_for('video') }}">🎥 Video</a>
+            <a href="{{ url_for('logs') }}">📝 Logs</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
         {% else %}
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-        
+            <a href="{{ url_for('login') }}">🔑 Login</a>
+            <a href="{{ url_for('register') }}">📝 Register</a>
         {% endif %}
     </div>
-
 </div>
 
 <!-- PAGE CONTENT -->
 <div class="container">
-
-    <h1>Video Detection 🎥</h1>
-
-    <p style="text-align:center;">
-        Upload a video to analyze crowd density and detect panic conditions.
-    </p>
+    <h1 class="cyber-title" style="font-size: 36px;">🎥 Video Detection</h1>
+    <div class="subtitle">
+        Upload a video to analyze crowd density and detect panic conditions in real-time
+    </div>
 
     <br>
 
     <!-- VIDEO UPLOAD FORM -->
-    <form action="/video_detect" method="POST" enctype="multipart/form-data">
-        <input type="file" name="video" accept="video/mp4,video/avi" required>
-        <br><br>
-        <button type="submit">Analyze Video</button>
-    </form>
+    <div class="upload-area">
+        <form action="{{ url_for('video_detect') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+            <input type="file" name="video" accept="video/mp4,video/avi,video/mov,video/mkv,video/webm" required id="videoInput">
+            <div class="file-info">📁 Supported formats: MP4, AVI, MOV, MKV, WEBM (Max 500MB)</div>
+            <div class="file-info">⏱️ Processing time depends on video length and resolution</div>
+            <br><br>
+            <button type="submit" id="detectBtn">🔍 Analyze Video</button>
+        </form>
+    </div>
 
-    <br>
+    <!-- LOADING SPINNER -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px;">🤖 Analyzing video with AI... This may take a few moments.</p>
+        <p style="font-size: 12px; color: #94a3b8;">Processing each frame using YOLOv8</p>
+    </div>
 
     <!-- RESULT SECTION -->
     {% if people_count is not none %}
+    <div class="result-container" id="resultContainer">
+        <h2>📊 Detection Result</h2>
+        
+        <div class="info-box">
+            <strong>✅ Video Analysis Complete</strong>
+        </div>
+        
+        <!-- STATS BAR -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <h4>👥 Peak People Count</h4>
+                <p>{{ people_count }}</p>
+            </div>
+            <div class="stat-card">
+                <h4>🎬 Frames Analyzed</h4>
+                <p id="frameCount">Calculated</p>
+            </div>
+            <div class="stat-card">
+                <h4>📊 Detection Status</h4>
+                <p>
+                    {% if "LOW" in message %}
+                        🟢 LOW
+                    {% elif "MEDIUM" in message %}
+                        🟡 MEDIUM
+                    {% elif "HIGH" in message %}
+                        🟠 HIGH
+                    {% else %}
+                        🔴 PANIC
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <div class="people-count-big">
+            👥 Maximum People Detected: <span style="color: #00eaff;">{{ people_count }}</span>
+        </div>
+        
+        <p style="text-align: center; font-size: 18px;">
+            <strong>Crowd Status:</strong>
+            {% if "LOW" in message %}
+                <span class="low status-icon">🟢</span> <span class="low">{{ message }}</span>
+                <span style="margin-left: 10px;"></span>
+            {% elif "MEDIUM" in message %}
+                <span class="medium status-icon">🟡</span> <span class="medium">{{ message }}</span>
+                <span style="margin-left: 10px;"></span>
+            {% elif "HIGH" in message %}
+                <span class="high status-icon">🟠</span> <span class="high">{{ message }}</span>
+                <span style="margin-left: 10px;"></span>
+            {% else %}
+                <span class="panic status-icon">🔴</span> <span class="panic">{{ message }}</span>
+                <span style="margin-left: 10px;"></span>
+            {% endif %}
+        </p>
 
-    <hr>
+        <!-- 🚨 PANIC ALERT SYSTEM -->
+        {% if "PANIC" in message %}
+        <div class="panic-box">
+            <h2 style="color: white; margin: 0;">🚨 PANIC ALERT 🚨</h2>
+            <p style="color: white; margin-top: 10px; font-size: 18px;">
+                ⚠️ Critical crowd density detected in video! Emergency protocols activated.
+            </p>
+            <p style="color: white; margin-top: 5px;">
+                👥 Peak crowd: {{ people_count }} people | 🔊 Siren activated | 📱 Alert sent
+            </p>
+        </div>
 
-    <h2>Detection Result</h2>
+        <script>
+            // Web-based siren that plays automatically
+            let panicSiren = null;
+            
+            function playPanicSiren() {
+                try {
+                    if (panicSiren) {
+                        panicSiren.pause();
+                        panicSiren.currentTime = 0;
+                    }
+                    
+                    var audio = new Audio("{{ url_for('static', filename='sounds/siren.mp3') }}");
+                    audio.loop = true;
+                    audio.volume = 0.9;
+                    
+                    var playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log("🔊 Panic siren playing!");
+                        }).catch(error => {
+                            console.log("Siren auto-play blocked.");
+                            showSirenButton();
+                        });
+                    }
+                    
+                    panicSiren = audio;
+                    return audio;
+                } catch(e) {
+                    console.log("Siren error:", e);
+                }
+            }
+            
+            function showSirenButton() {
+                var sirenBtn = document.createElement('button');
+                sirenBtn.innerHTML = "🔊 Enable Siren";
+                sirenBtn.style.position = "fixed";
+                sirenBtn.style.bottom = "20px";
+                sirenBtn.style.right = "20px";
+                sirenBtn.style.zIndex = "1000";
+                sirenBtn.style.background = "#ef4444";
+                sirenBtn.style.color = "white";
+                sirenBtn.style.border = "none";
+                sirenBtn.style.padding = "10px 20px";
+                sirenBtn.style.borderRadius = "8px";
+                sirenBtn.style.cursor = "pointer";
+                sirenBtn.onclick = function() {
+                    playPanicSiren();
+                    this.remove();
+                };
+                document.body.appendChild(sirenBtn);
+            }
+            
+            // Auto-play siren when panic is detected
+            if ("{{ message }}" && "{{ message }}".includes("PANIC")) {
+                setTimeout(playPanicSiren, 500);
+            }
+            
+            // Panic overlay and notifications
+            document.getElementById('panicOverlay').style.display = 'block';
+            document.body.classList.add("panic-alert");
+            
+            if (Notification.permission === "granted") {
+                new Notification("🚨 PANIC ALERT!", {
+                    body: "Critical crowd density detected in video! " + {{ people_count }} + " people found.",
+                    icon: "{{ url_for('static', filename='images/logo.png') }}"
+                });
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+        </script>
 
-    <p>
-        <strong>Total People Detected:</strong>
-        {{ people_count }}
-    </p>
-
-    <p>
-        <strong>Crowd Status:</strong>
-
-        {% if "LOW" in message %}
-            <span class="low">{{ message }}</span>
-
-        {% elif "MEDIUM" in message %}
-            <span class="medium">{{ message }}</span>
-
-        {% elif "HIGH" in message %}
-            <span class="high">{{ message }}</span>
-
-        {% else %}
-            <span class="panic">{{ message }}</span>
+        <audio id="siren" loop preload="auto" style="display:none;">
+            <source src="{{ url_for('static', filename='sounds/siren.mp3') }}" type="audio/mpeg">
+        </audio>
         {% endif %}
 
-    </p>
+        <br>
 
-    <br>
+        <!-- PROCESSED VIDEO OUTPUT -->
+        {% if output_video %}
+        <h3 style="text-align:center;">🎬 Processed Video Output</h3>
+        <video class="processed-video" controls autoplay style="display:block; margin:auto; max-width:100%; border-radius:12px;">
+            <source src="{{ output_video }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
 
-    <!-- 🚨 PANIC ALERT SYSTEM -->
-    {% if "PANIC" in message %}
-
-    <script>
-        document.body.classList.add("panic-alert");
-    </script>
-
-    <audio id="siren" autoplay loop>
-        <source src="{{ url_for('static', filename='sounds/siren.mp3') }}" type="audio/mpeg">
-    </audio>
-
-    <script>
-        document.getElementById("siren").play();
-    </script>
-
-    <h2 style="text-align:center; color:red; font-size:30px;">
-        🚨 PANIC ALERT 🚨
-    </h2>
-
+        <div class="file-info" style="text-align: center; margin-top: 10px;">
+            📊 Video shows detected people with green bounding boxes
+        </div>
+        {% endif %}
+        
+        <!-- ACTION BUTTONS (DASHBOARD LINK REMOVED) -->
+        <div style="text-align: center; margin-top: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('video') }}">
+                <button>🎥 Analyze Another Video</button>
+            </a>
+            <a href="{{ url_for('logs') }}">
+                <button class="reset-btn">📝 View Logs</button>
+            </a>
+        </div>
+        
+        <!-- TIMESTAMP -->
+        <div class="file-info" style="text-align: center; margin-top: 20px;">
+            ✅ Detection completed and logged in system
+        </div>
+    </div>
     {% endif %}
-
-    <br>
-
-    <p style="text-align:center;">
-        📊 AI model analyzed the video frames using YOLOv8 and detected crowd density.
-    </p>
-
-    <!-- PROCESSED VIDEO OUTPUT -->
-    {% if output_video %}
-
-    <h3 style="text-align:center;">Processed Video Output 🎥</h3>
-
-    <video width="70%" controls style="display:block; margin:auto; border-radius:10px;">
-        <source src="{{ output_video }}" type="video/mp4">
-    </video>
-
-    {% endif %}
-
-    {% endif %}
-
+    
+    <!-- INFORMATION SECTION -->
+    <div class="info-box" style="margin-top: 30px;">
+        <h3>💡 How Video Detection Works</h3>
+        <p>📤 1. Upload a video file (MP4, AVI, MOV, MKV)</p>
+        <p>🤖 2. AI processes each frame using YOLOv8 object detection</p>
+        <p>📊 3. System tracks peak crowd density throughout the video</p>
+        <p>🚨 4. Automatic alerts trigger if panic threshold is exceeded</p>
+        <p>💾 5. Results saved to logs with processed video output</p>
+    </div>
+    
+    <div class="info-box">
+        <h3>📊 Alert Level Thresholds</h3>
+        <p>🟢 <strong>LOW CROWD</strong>: (Safe - No action needed)</p>
+        <p>🟡 <strong>MEDIUM CROWD</strong>:  (Moderate - Monitor situation)</p>
+        <p>🟠 <strong>HIGH CROWD</strong>:  (Warning - Prepare for action)</p>
+        <p>🔴 <strong>PANIC ALERT</strong>:  (Emergency - Immediate action required!)</p>
+    </div>
+    
+    <div class="info-box">
+        <h3>💡 Tips for Best Results</h3>
+        <p>🎥 Use clear videos with good lighting</p>
+        <p>📏 Ensure people are visible and not too small in frame</p>
+        <p>⏱️ Shorter videos process faster (recommended under 2 minutes)</p>
+        <p>📹 Higher resolution videos take longer to process</p>
+    </div>
 </div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <p>© 2026 PanicVision - AI Crowd Panic Detection System | All Rights Reserved</p>
+    <p style="font-size: 12px; margin-top: 5px;">Powered by YOLOv8 & Flask</p>
+</div>
+
+<script>
+    // Form submission loading effect
+    const form = document.getElementById('uploadForm');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const detectBtn = document.getElementById('detectBtn');
+    const videoInput = document.getElementById('videoInput');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (videoInput.files.length > 0) {
+                loadingSpinner.classList.add('active');
+                detectBtn.disabled = true;
+                detectBtn.textContent = '⏳ Processing Video...';
+            }
+        });
+    }
+    
+    // File validation
+    if (videoInput) {
+        videoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const validExts = ['mp4', 'avi', 'mov', 'mkv', 'webm'];
+                const fileExt = file.name.split('.').pop().toLowerCase();
+                
+                if (!validExts.includes(fileExt)) {
+                    alert('❌ Please upload a valid video file (MP4, AVI, MOV, MKV, WEBM)');
+                    this.value = '';
+                }
+                if (file.size > 500 * 1024 * 1024) {
+                    alert('❌ File size must be less than 500MB');
+                    this.value = '';
+                }
+            }
+        });
+    }
+    
+    // Auto-scroll to results
+    if (document.getElementById('resultContainer')) {
+        document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
 
 </body>
 </html>

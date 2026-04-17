@@ -1,64 +1,194 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    
+    <style>
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .form-box {
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 20px;
+        }
+        
+        .form-box input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #f1f5f9;
+            transition: 0.3s;
+        }
+        
+        .form-box input:focus {
+            outline: none;
+            border-color: #00eaff;
+            box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+        }
+        
+        .form-box button {
+            width: 150px;
+            margin: 15px auto 0;
+            background: transparent;
+            border: 1px solid #00eaff;
+            color: #00eaff;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        
+        .form-box button:hover {
+            background: #00eaff;
+            color: #0f172a;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00eaff;
+        }
+        
+        .demo-credentials {
+            background: rgba(0, 234, 255, 0.1);
+            border: 1px solid rgba(0, 234, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .demo-credentials p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .demo-credentials code {
+            background: #0f172a;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #00eaff;
+            font-size: 12px;
+            display: inline-block;
+            margin: 5px;
+        }
+    </style>
 </head>
 
 <body>
 
 <!-- NAVBAR -->
 <div class="navbar">
-
     <div style="display:flex; align-items:center; gap:12px;">
         <img src="{{ url_for('static', filename='images/logo.png') }}" 
-             class="logo">
-
-        <h2>PANIC VISION</h2>
+             class="logo"
+             alt="PanicVision Logo">
+        <h2 style="margin:0;">PANIC VISION</h2>
     </div>
 
     <div>
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
+        <a href="{{ url_for('login') }}">🔑 Login</a>
+        <a href="{{ url_for('register') }}">📝 Register</a>
     </div>
-
 </div>
 
 <!-- LOGIN FORM -->
 <div class="container">
-
-    <h1>Login to Panic Vision</h1>
-
+    <h1 class="cyber-title" style="font-size: 36px;">🔐 Welcome Back</h1>
     <p class="subtitle">
         Access your AI Crowd Panic Detection System
     </p>
 
-    <!-- IMPORTANT FIX HERE -->
-    <form action="/login" method="POST" class="form-box">
+    <!-- ERROR MESSAGE DISPLAY -->
+    {% if error %}
+    <div class="error-message">
+        ❌ {{ error }}
+    </div>
+    {% endif %}
 
+    <!-- LOGIN FORM -->
+    <form action="{{ url_for('login') }}" method="POST" class="form-box">
         <input type="email"
                name="email"
-               placeholder="Enter your email"
-               required>
-
+               placeholder="📧 Enter your email"
+               required
+               autocomplete="email"
+               autofocus>
+        
         <input type="password"
                name="password"
-               placeholder="Enter your password"
-               required>
+               id="password"
+               placeholder="🔒 Enter your password"
+               required
+               autocomplete="current-password">
 
-        <button type="submit">Login</button>
-
+        <button type="submit">🔓 Login</button>
     </form>
 
     <p class="bottom-text">
         Don't have an account?
-        <a href="/register">Register here</a>
+        <a href="{{ url_for('register') }}">Register here</a>
     </p>
 
+    <!-- DEMO CREDENTIALS (Optional - Remove in production) -->
+    <div class="demo-credentials">
+        <p>📋 Demo Credentials (for testing):</p>
+        <code>Email: user@example.com</code>
+        <code>Password: password123</code>
+        <p style="font-size: 12px; margin-top: 8px;">⚠️ Register a new account if you don't have one</p>
+    </div>
 </div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <p>© 2026 PanicVision - AI Crowd Panic Detection System | All Rights Reserved</p>
+    <p style="font-size: 12px; margin-top: 5px;">Powered by YOLOv8 & Flask</p>
+</div>
+
+<script>
+    // Clear error message on input (optional)
+    const errorDiv = document.querySelector('.error-message');
+    if (errorDiv) {
+        setTimeout(() => {
+            errorDiv.style.opacity = '0.7';
+        }, 3000);
+    }
+    
+    // Add floating label effect (optional)
+    const inputs = document.querySelectorAll('.form-box input');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.transform = 'scale(1.02)';
+        });
+        input.addEventListener('blur', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+</script>
 
 </body>
 </html>

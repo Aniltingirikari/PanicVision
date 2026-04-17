@@ -1,108 +1,329 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    
     <style>
         .form-box {
             max-width: 400px;
-            margin: auto;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 18px;
+            margin-top: 20px;
         }
 
         .form-box input {
             width: 100%;
             padding: 12px;
             border-radius: 8px;
-            border: none;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #f1f5f9;
             outline: none;
+            transition: 0.3s;
+        }
+
+        .form-box input:focus {
+            border-color: #00eaff;
+            box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
         }
 
         .form-box button {
             padding: 12px;
             border-radius: 8px;
-            border: none;
-            background: #4fc3f7;
-            color: black;
+            border: 1px solid #00eaff;
+            background: transparent;
+            color: #00eaff;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.3s;
         }
 
         .form-box button:hover {
-            background: #29b6f6;
+            background: #00eaff;
+            color: #0f172a;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px #00eaff;
+        }
+        
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .success-message {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .password-strength {
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        
+        .strength-weak { color: #ef4444; }
+        .strength-medium { color: #facc15; }
+        .strength-strong { color: #22c55e; }
+        
+        .terms {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 20px;
+        }
+        
+        .terms a {
+            color: #00eaff;
+        }
+        
+        .requirements {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 5px;
+            padding-left: 5px;
+        }
+        
+        .requirements ul {
+            margin: 5px 0 0 20px;
+        }
+        
+        .requirements li {
+            margin: 3px 0;
+        }
+        
+        .requirements li.valid {
+            color: #22c55e;
+            text-decoration: line-through;
         }
     </style>
-
 </head>
 
 <body>
 
 <!-- NAVBAR -->
 <div class="navbar">
-
     <div style="display:flex; align-items:center; gap:10px;">
         <img src="{{ url_for('static', filename='images/logo.png') }}" 
              width="40" height="40" 
-             style="border-radius:50%; object-fit:cover;">
-
+             style="border-radius:50%; object-fit:cover;"
+             alt="PanicVision Logo">
         <h2 style="margin:0;">PANIC VISION</h2>
     </div>
 
     <div>
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
+        <a href="{{ url_for('login') }}">🔑 Login</a>
+        <a href="{{ url_for('register') }}">📝 Register</a>
     </div>
-
 </div>
 
 <!-- FORM CONTAINER -->
 <div class="container">
+    <h1 class="cyber-title" style="font-size: 36px;">📝 Create Account</h1>
+    <div class="subtitle">
+        Join PanicVision AI Crowd Detection System
+    </div>
 
-    <h1>Create Account</h1>
-
-    <p style="text-align:center;">
-        Join Panic Vision AI Crowd Detection System
-    </p>
+    <!-- ERROR MESSAGE DISPLAY -->
+    {% if error %}
+    <div class="error-message">
+        ❌ {{ error }}
+    </div>
+    {% endif %}
+    
+    <!-- SUCCESS MESSAGE DISPLAY -->
+    {% if success %}
+    <div class="success-message">
+        ✅ {{ success }}
+    </div>
+    {% endif %}
 
     <br>
 
-    <form method="POST" class="form-box">
-
+    <form method="POST" class="form-box" id="registerForm">
         <input type="text" 
                name="username" 
-               placeholder="Enter username" 
-               required>
-
+               id="username"
+               placeholder="👤 Enter username" 
+               required
+               autocomplete="username"
+               autofocus>
+        
         <input type="email" 
                name="email" 
-               placeholder="Enter email" 
-               required>
-
+               id="email"
+               placeholder="📧 Enter email" 
+               required
+               autocomplete="email">
+        
         <input type="password" 
                name="password" 
-               placeholder="Enter password" 
-               required>
+               id="password"
+               placeholder="🔒 Enter password" 
+               required
+               autocomplete="new-password">
+        
+        <div class="password-strength" id="passwordStrength"></div>
+        
+        <div class="requirements" id="passwordRequirements">
+            <small>Password must contain:</small>
+            <ul>
+                <li id="req-length">✓ At least 6 characters</li>
+                <li id="req-upper">✓ Uppercase letter (A-Z)</li>
+                <li id="req-lower">✓ Lowercase letter (a-z)</li>
+                <li id="req-digit">✓ Number (0-9)</li>
+            </ul>
+        </div>
 
-        <button type="submit">Register</button>
-
+        <button type="submit">✅ Register</button>
     </form>
 
     <br>
 
-    <p style="text-align:center;">
+    <p class="bottom-text" style="text-align:center;">
         Already have an account?
-        <a href="/login">Login here</a>
+        <a href="{{ url_for('login') }}">Login here</a>
     </p>
-
+    
+    <div class="terms">
+        By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+    </div>
 </div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <p>© 2026 PanicVision - AI Crowd Panic Detection System | All Rights Reserved</p>
+    <p style="font-size: 12px; margin-top: 5px;">Powered by YOLOv8 & Flask</p>
+</div>
+
+<script>
+    // Password strength checker
+    const passwordInput = document.getElementById('password');
+    const strengthDiv = document.getElementById('passwordStrength');
+    const reqLength = document.getElementById('req-length');
+    const reqUpper = document.getElementById('req-upper');
+    const reqLower = document.getElementById('req-lower');
+    const reqDigit = document.getElementById('req-digit');
+    
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        let requirements = {
+            length: password.length >= 6,
+            upper: /[A-Z]/.test(password),
+            lower: /[a-z]/.test(password),
+            digit: /[0-9]/.test(password)
+        };
+        
+        // Update requirement list
+        if (requirements.length) {
+            reqLength.style.color = '#22c55e';
+            reqLength.innerHTML = '✓ At least 6 characters';
+        } else {
+            reqLength.style.color = '#ef4444';
+            reqLength.innerHTML = '✗ At least 6 characters';
+        }
+        
+        if (requirements.upper) {
+            reqUpper.style.color = '#22c55e';
+            reqUpper.innerHTML = '✓ Uppercase letter (A-Z)';
+        } else {
+            reqUpper.style.color = '#ef4444';
+            reqUpper.innerHTML = '✗ Uppercase letter (A-Z)';
+        }
+        
+        if (requirements.lower) {
+            reqLower.style.color = '#22c55e';
+            reqLower.innerHTML = '✓ Lowercase letter (a-z)';
+        } else {
+            reqLower.style.color = '#ef4444';
+            reqLower.innerHTML = '✗ Lowercase letter (a-z)';
+        }
+        
+        if (requirements.digit) {
+            reqDigit.style.color = '#22c55e';
+            reqDigit.innerHTML = '✓ Number (0-9)';
+        } else {
+            reqDigit.style.color = '#ef4444';
+            reqDigit.innerHTML = '✗ Number (0-9)';
+        }
+        
+        // Calculate strength
+        if (requirements.length) strength++;
+        if (requirements.upper) strength++;
+        if (requirements.lower) strength++;
+        if (requirements.digit) strength++;
+        
+        // Display strength message
+        if (password.length === 0) {
+            strengthDiv.innerHTML = '';
+        } else if (strength <= 2) {
+            strengthDiv.innerHTML = '<span class="strength-weak">🔴 Weak password</span>';
+        } else if (strength === 3) {
+            strengthDiv.innerHTML = '<span class="strength-medium">🟡 Medium password</span>';
+        } else {
+            strengthDiv.innerHTML = '<span class="strength-strong">🟢 Strong password</span>';
+        }
+        
+        return strength === 4;
+    }
+    
+    passwordInput.addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+    });
+    
+    // Form validation before submit
+    const form = document.getElementById('registerForm');
+    form.addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const isValid = checkPasswordStrength(password);
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('❌ Please ensure your password meets all requirements:\n- At least 6 characters\n- At least one uppercase letter\n- At least one lowercase letter\n- At least one number');
+        }
+    });
+    
+    // Username validation (no special characters)
+    const usernameInput = document.getElementById('username');
+    usernameInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^a-zA-Z0-9_]/g, '');
+    });
+    
+    // Email validation
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('blur', function() {
+        const email = this.value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email && !emailRegex.test(email)) {
+            this.style.borderColor = '#ef4444';
+            alert('❌ Please enter a valid email address');
+        } else {
+            this.style.borderColor = '#334155';
+        }
+    });
+</script>
 
 </body>
 </html>
-

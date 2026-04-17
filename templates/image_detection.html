@@ -1,128 +1,419 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Detection</title>
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    
+    <style>
+        .upload-area {
+            border: 2px dashed #00eaff;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: 0.3s;
+            background: rgba(0, 234, 255, 0.05);
+        }
+        
+        .upload-area:hover {
+            border-color: #0ea5e9;
+            background: rgba(0, 234, 255, 0.1);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 234, 255, 0.2);
+        }
+        
+        .people-count-big {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .status-icon {
+            font-size: 24px;
+            vertical-align: middle;
+        }
+        
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(239, 68, 68, 0.3);
+            pointer-events: none;
+            z-index: 999;
+            animation: panicFlash 0.5s infinite;
+            display: none;
+        }
+        
+        @keyframes panicFlash {
+            0% { background: rgba(239, 68, 68, 0); }
+            50% { background: rgba(239, 68, 68, 0.5); }
+            100% { background: rgba(239, 68, 68, 0); }
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading-spinner.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 234, 255, 0.3);
+            border-top: 4px solid #00eaff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            margin: 20px 0;
+        }
+        
+        .info-box {
+            background: #0a1a2f;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #00eaff;
+        }
+        
+        .file-info {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        .reset-btn {
+            background: transparent;
+            border: 1px solid #f97316;
+            color: #f97316;
+            margin-left: 10px;
+        }
+        
+        .reset-btn:hover {
+            background: #f97316;
+            color: #0f172a;
+            box-shadow: 0 0 15px #f97316;
+        }
+        
+        .panic-box {
+            background: linear-gradient(135deg, #7f1d1d, #dc2626);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .threshold-item {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 
 <body>
 
+<!-- PANIC OVERLAY -->
+<div id="panicOverlay" class="alert-overlay"></div>
+
 <!-- NAVBAR -->
 <div class="navbar">
-
     <div style="display:flex; align-items:center; gap:10px;">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" 
-         width="40" height="40" 
-         style="border-radius:50%;">
-
-    <h2 style="margin:0;">PANIC VISION</h2>
-</div>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" 
+             width="40" height="40" 
+             style="border-radius:50%;"
+             alt="PanicVision Logo">
+        <h2 style="margin:0;">PANIC VISION</h2>
+    </div>
 
     <div>
         {% if session.get('user') %}
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('about') }}">About</a>
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('image') }}">Image Detection</a>
-        <a href="{{ url_for('video') }}">Video Detection</a>
-        <a href="{{ url_for('logs') }}">Logs</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
-
+            <a href="{{ url_for('home') }}">🏠 Home</a>
+            <a href="{{ url_for('about') }}">ℹ️ About</a>
+            <a href="{{ url_for('image') }}">🖼️ Image</a>
+            <a href="{{ url_for('video') }}">🎥 Video</a>
+            <a href="{{ url_for('logs') }}">📝 Logs</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
         {% else %}
-
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-        
+            <a href="{{ url_for('login') }}">🔑 Login</a>
+            <a href="{{ url_for('register') }}">📝 Register</a>
         {% endif %}
     </div>
-
 </div>
 
 <!-- PAGE CONTENT -->
 <div class="container">
+    <h1 class="cyber-title">📸 Image Detection</h1>
+    <div class="subtitle">
+        Upload an image to detect number of people and crowd density level
+    </div>
 
-<h1>Image Detection 📸</h1>
+    <br>
 
-<p style="text-align:center;">
-Upload an image to detect number of people and crowd density level.
-</p>
+    <!-- IMAGE UPLOAD FORM -->
+    <div class="upload-area">
+        <form action="{{ url_for('image_detect') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+            <input type="file" name="image" accept="image/*" required id="imageInput">
+            <div class="file-info">📁 Supported formats: JPG, JPEG, PNG, BMP (Max 50MB)</div>
+            <br><br>
+            <button type="submit" id="detectBtn">🔍 Detect Crowd</button>
+        </form>
+    </div>
 
-<br>
+    <!-- LOADING SPINNER -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px;">🤖 Analyzing image with AI...</p>
+    </div>
 
-<!-- IMAGE UPLOAD FORM -->
-<form action="/image_detect" method="POST" enctype="multipart/form-data">
-    <input type="file" name="image" required>
-    <br><br>
-    <button type="submit">Detect Crowd</button>
-</form>
+    <!-- DETECTION RESULT -->
+    {% if result_image %}
+    <div class="result-container" id="resultContainer">
+        <h2>📊 Detection Result</h2>
+        
+        <div class="info-box">
+            <strong>✅ Image Analysis Complete</strong>
+        </div>
+        
+        <div class="people-count-big">
+            👥 Total People Detected: <span style="color: #00eaff;">{{ people_count }}</span>
+        </div>
+        
+        <p style="text-align: center; font-size: 18px;">
+            <strong>Crowd Status:</strong>
+            {% if "LOW" in panic_status %}
+                <span class="low status-icon">🟢</span> <span class="low">{{ panic_status }}</span>
+                <span style="margin-left: 10px;"></span>
+            {% elif "MEDIUM" in panic_status %}
+                <span class="medium status-icon">🟡</span> <span class="medium">{{ panic_status }}</span>
+                <span style="margin-left: 10px;"></span>
+            {% elif "HIGH" in panic_status %}
+                <span class="high status-icon">🟠</span> <span class="high">{{ panic_status }}</span>
+                <span style="margin-left: 10px;"></span>
+            {% else %}
+                <span class="panic status-icon">🔴</span> <span class="panic">{{ panic_status }}</span>
+                <span style="margin-left: 10px;"></span>
+            {% endif %}
+        </p>
 
-<br>
+        <!-- 🚨 PANIC ALERT SYSTEM -->
+        {% if "PANIC" in panic_status %}
+        <div class="panic-box">
+            <h2 style="color: white; margin: 0;">🚨 PANIC ALERT 🚨</h2>
+            <p style="color: white; margin-top: 10px; font-size: 18px;">
+                ⚠️ High crowd density detected! Emergency protocols activated.
+            </p>
+            <p style="color: white; margin-top: 5px;">
+                👥 {{ people_count }} people detected | 🔊 Siren activated | 📱 Alert sent
+            </p>
+        </div>
 
-<!-- DETECTION RESULT -->
-{% if result_image %}
+        <script>
+            // Web-based siren that plays automatically
+            let panicSiren = null;
+            
+            function playPanicSiren() {
+                try {
+                    if (panicSiren) {
+                        panicSiren.pause();
+                        panicSiren.currentTime = 0;
+                    }
+                    
+                    var audio = new Audio("{{ url_for('static', filename='sounds/siren.mp3') }}");
+                    audio.loop = true;
+                    audio.volume = 0.9;
+                    
+                    var playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log("🔊 Panic siren playing!");
+                        }).catch(error => {
+                            console.log("Siren auto-play blocked.");
+                            showSirenButton();
+                        });
+                    }
+                    
+                    panicSiren = audio;
+                    return audio;
+                } catch(e) {
+                    console.log("Siren error:", e);
+                }
+            }
+            
+            function showSirenButton() {
+                var sirenBtn = document.createElement('button');
+                sirenBtn.innerHTML = "🔊 Enable Siren";
+                sirenBtn.style.position = "fixed";
+                sirenBtn.style.bottom = "20px";
+                sirenBtn.style.right = "20px";
+                sirenBtn.style.zIndex = "1000";
+                sirenBtn.style.background = "#ef4444";
+                sirenBtn.style.color = "white";
+                sirenBtn.style.border = "none";
+                sirenBtn.style.padding = "10px 20px";
+                sirenBtn.style.borderRadius = "8px";
+                sirenBtn.style.cursor = "pointer";
+                sirenBtn.onclick = function() {
+                    playPanicSiren();
+                    this.remove();
+                };
+                document.body.appendChild(sirenBtn);
+            }
+            
+            // Auto-play siren when panic is detected
+            if ("{{ panic_status }}" && "{{ panic_status }}".includes("PANIC")) {
+                setTimeout(playPanicSiren, 500);
+            }
+            
+            // Panic overlay and notifications
+            document.getElementById('panicOverlay').style.display = 'block';
+            document.body.classList.add("panic-alert");
+            
+            if (Notification.permission === "granted") {
+                new Notification("🚨 PANIC ALERT!", {
+                    body: "High crowd density detected! " + {{ people_count }} + " people found.",
+                    icon: "{{ url_for('static', filename='images/logo.png') }}"
+                });
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+        </script>
 
-<hr>
+        <audio id="siren" loop preload="auto" style="display:none;">
+            <source src="{{ url_for('static', filename='sounds/siren.mp3') }}" type="audio/mpeg">
+        </audio>
+        {% endif %}
+        
+        <br>
 
-<h2>Detection Result</h2>
-
-<p>
-<strong>Total People Detected:</strong> {{ people_count }}
-</p>
-
-<p>
-<strong>Crowd Status:</strong>
-
-{% if "LOW" in panic_status %}
-    <span class="low">{{ panic_status }}</span>
-
-{% elif "MEDIUM" in panic_status %}
-    <span class="medium">{{ panic_status }}</span>
-
-{% elif "HIGH" in panic_status %}
-    <span class="high">{{ panic_status }}</span>
-
-{% else %}
-    <span class="panic">{{ panic_status }}</span>
-{% endif %}
-
-</p>
-
-<br>
-
-<!-- 🚨 PANIC ALERT SYSTEM -->
-{% if "PANIC" in panic_status %}
-
-<script>
-    document.body.classList.add("panic-alert");
-</script>
-
-<audio id="siren" autoplay loop>
-    <source src="{{ url_for('static', filename='sounds/siren.mp3') }}" type="audio/mpeg">
-</audio>
-
-<script>
-    document.getElementById("siren").play();
-</script>
-
-<h2 style="text-align:center; color:red; font-size:30px;">
-    🚨 PANIC ALERT 🚨
-</h2>
-
-{% endif %}
-
-<br>
-
-<!-- RESULT IMAGE -->
-<h3 style="text-align:center;">Processed Image Output</h3>
-
-<img src="{{ result_image }}" width="80%" style="display:block; margin:auto; border-radius:10px;">
-
-{% endif %}
-
+        <!-- RESULT IMAGE -->
+        <h3 style="text-align:center;">🖼️ Processed Image Output</h3>
+        <img src="{{ result_image }}" class="result-image" style="display:block; margin:auto;" alt="Processed detection result">
+        
+        <!-- ACTION BUTTONS (DASHBOARD LINK REMOVED) -->
+        <div style="text-align: center; margin-top: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('image') }}">
+                <button>📸 Upload Another Image</button>
+            </a>
+            <a href="{{ url_for('logs') }}">
+                <button class="reset-btn">📝 View Logs</button>
+            </a>
+        </div>
+        
+        <!-- TIMESTAMP -->
+        <div class="file-info" style="text-align: center; margin-top: 20px;">
+            ✅ Detection completed and logged in system
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- INFORMATION SECTION -->
+    <div class="info-box" style="margin-top: 30px;">
+        <h3>💡 How It Works</h3>
+        <p>📤 1. Upload a clear image with people visible</p>
+        <p>🤖 2. Our YOLOv8 AI model detects and counts each person</p>
+        <p>📊 3. System classifies crowd density into alert levels</p>
+        <p>💾 4. Results are saved to logs for future reference</p>
+        <p>🚨 5. Automatic alerts trigger if panic conditions are met</p>
+    </div>
+    
+    <div class="info-box">
+        <h3>📊 Alert Level Thresholds</h3>
+        <div class="threshold-item low">🟢 <strong>LOW CROWD</strong>:  (Safe - No action needed)</div>
+        <div class="threshold-item medium">🟡 <strong>MEDIUM CROWD</strong>:  (Moderate - Monitor situation)</div>
+        <div class="threshold-item high">🟠 <strong>HIGH CROWD</strong> (Warning - Prepare for action)</div>
+        <div class="threshold-item panic">🔴 <strong>PANIC ALERT</strong>: (Emergency - Immediate action required!)</div>
+    </div>
+    
+    <div class="info-box">
+        <h3>📱 Alert System</h3>
+        <p>🔊 <strong>Siren Alert:</strong> Automatic siren plays during panic situations</p>
+        <p>📨 <strong>Telegram Alert:</strong> Instant notification sent to authorized users</p>
+        <p>💾 <strong>Database Log:</strong> All detections stored for future reference</p>
+    </div>
 </div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <p>© 2026 PanicVision - AI Crowd Panic Detection System | All Rights Reserved</p>
+    <p style="font-size: 12px; margin-top: 5px;">Powered by YOLOv8 & Flask</p>
+</div>
+
+<script>
+    // Form submission loading effect
+    const form = document.getElementById('uploadForm');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const detectBtn = document.getElementById('detectBtn');
+    const imageInput = document.getElementById('imageInput');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (imageInput.files.length > 0) {
+                loadingSpinner.classList.add('active');
+                detectBtn.disabled = true;
+                detectBtn.textContent = '⏳ Processing...';
+            }
+        });
+    }
+    
+    // File validation
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/bmp'];
+                if (!validTypes.includes(file.type)) {
+                    alert('❌ Please upload a valid image file (JPG, JPEG, PNG, BMP)');
+                    this.value = '';
+                }
+                if (file.size > 50 * 1024 * 1024) {
+                    alert('❌ File size must be less than 50MB');
+                    this.value = '';
+                }
+            }
+        });
+    }
+    
+    // Auto-scroll to results
+    if (document.getElementById('resultContainer')) {
+        document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
 
 </body>
 </html>
