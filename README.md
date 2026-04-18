@@ -1,4 +1,4 @@
-# AI Crowd Panic Detection System
+# Panic Vision - AI Crowd Panic Detection System
 
 ## Overview
 
@@ -67,7 +67,6 @@ To solve this, we developed an AI Crowd Panic Detection System that uses compute
 
 ```
 git clone https://github.com/Aniltingirikari/PanicVision.git
-cd panic-vision
 ```
 
 ### Install Dependencies
