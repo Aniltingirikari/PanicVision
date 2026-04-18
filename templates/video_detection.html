@@ -222,7 +222,7 @@
     <div class="upload-area">
         <form action="{{ url_for('video_detect') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
             <input type="file" name="video" accept="video/mp4,video/avi,video/mov,video/mkv,video/webm" required id="videoInput">
-            <div class="file-info">📁 Supported formats: MP4, AVI, MOV, MKV, WEBM (Max 500MB)</div>
+            <div class="file-info">📁 Supported formats: MP4 (Max 500MB)</div>
             <div class="file-info">⏱️ Processing time depends on video length and resolution</div>
             <br><br>
             <button type="submit" id="detectBtn">🔍 Analyze Video</button>

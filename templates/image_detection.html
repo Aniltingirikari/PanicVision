@@ -189,7 +189,8 @@
     <div class="upload-area">
         <form action="{{ url_for('image_detect') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
             <input type="file" name="image" accept="image/*" required id="imageInput">
-            <div class="file-info">📁 Supported formats: JPG, JPEG, PNG, BMP (Max 50MB)</div>
+            <div class="file-info">📁 Supported formats: JPG (Max 50MB)</div>
+            <div class="file-info">⏱️Processing time depends on image length and resolution</div>
             <br><br>
             <button type="submit" id="detectBtn">🔍 Detect Crowd</button>
         </form>
